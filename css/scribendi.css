@@ -1,0 +1,22 @@
+/**
+ * Additional style declarations needed by the Scribendi.com plugin
+ *
+ * Version: 1.0.0
+ * Author: Scribendi.com
+ * Author URI: http://www.scribendi.com/
+ */
+table.scribendi-quotes { width: 100%; border: 1px solid #ccc; }
+table.scribendi-quotes thead { text-align: left; font-weight: bold; }
+table.scribendi-quotes thead tr.scribendi-ready { width: 100px; }
+table.scribendi-quotes thead tr.scribendi-price { width: 100px; }
+table.scribendi-quotes thead tr.scribendi-actions {  }
+table.scribendi-quotes thead th { border-bottom: 1px solid #000; font-size: 12px; padding: 2px; }
+table.scribendi-quotes tbody { text-align: left; font-weight: normal; }
+table.scribendi-quotes tbody tr.alt { background-color: #efefef; }
+table.scribendi-quotes tbody td { padding: 2px; }
+table.scribendi-quotes tbody td.center { text-align: center; }
+table.scribendi-quotes tbody td.right { text-align: right; }
+table.scribendi-quotes tbody td.left { text-align: left; }
+
+.post-revisions .scribendi-highlight { padding: 5px; background-color: #efe; }
+.post-revisions .scribendi-highlight td { border-top: 1px solid #090; border-bottom: 1px solid #090; }
