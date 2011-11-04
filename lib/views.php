@@ -168,7 +168,7 @@ function bindQuoteLink($) {
 	$('#scribendi-quote').click(function(){
 		var data = {
 			action: 'scribendi_quote',
-			wordcount: $('#word-count').text(),
+			wordcount: $('#word-count').text() || $('.word-count').first().text(),
 			time: function() {
 				var dt = new Date();
 				return dt.getTime();
@@ -202,7 +202,7 @@ function bindOrderHandlers($) {
 	$('input.scribendi-order-service').click(function(){
 		var data = {
 			action: 'scribendi_order',
-			wordcount: $('#word-count').text(),
+			wordcount: $('#word-count').text() || $('.word-count').first().text(),
 			serviceId: $(this).parents('tr').attr('id').replace('scribendi-service-', ''),
 			postId: $('#post_ID').val(),
 			time: function() {

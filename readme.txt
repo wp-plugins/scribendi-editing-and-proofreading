@@ -2,7 +2,7 @@
 Contributors: Scribendi
 Tags: copy-editing, copyediting, copy-editors, publishing, scribendi, grammar, spelling, punctuation, structure, post-publish editing, editors, editor, page, pages, post, posts
 Requires at least: 3.0
-Tested up to: 3.1.4
+Tested up to: 3.2.1
 Stable tag: trunk
 
 Scribendi provides ISO certified, comprehensive, and professional editing services to WordPress users. Our services are available 24/7.
@@ -79,3 +79,7 @@ There are currently no upgrade issues.
 = 1.0 =
 
 * First release
+
+= 1.1 =
+
+* Update for WordPress 3.2
