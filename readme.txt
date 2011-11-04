@@ -76,10 +76,13 @@ There are currently no upgrade issues.
 
 == Changelog ==
 
-= 1.0 =
+= 1.1 =
+* Update for WordPress 3.2
 
+= 1.0 =
 * First release
 
-= 1.1 =
+== Upgrade Notice ==
 
-* Update for WordPress 3.2
+= 1.1 =
+Recommended Update. Resolves compatibility issues with WordPress 3.2

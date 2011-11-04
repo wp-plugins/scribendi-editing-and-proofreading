@@ -3,7 +3,7 @@
 Plugin Name: Scribendi.com Editing and Proofreading Services
 Plugin URI: http://wordpress.org/extend/plugins/scribendi-editing-and-proofreading/
 Description: Scribendi provides ISO certified, comprehensive, and professional editing services to WordPress users. Our services are available 24/7.
-Version: 1.0.0
+Version: 1.1.0
 Author: Scribendi.com
 Author URI: http://www.scribendi.com/
 */
@@ -164,7 +164,7 @@ define('SCRIBENDI_TOOLBOX_ID', 'scribendi_toolbox');
 /*
  * Register our additional stylesheet
  */
-wp_enqueue_style('scribendi_style', SCRIBENDI_PLUGIN_URL.'/css/scribendi.css', null, '1.0', 'screen');
+wp_enqueue_style('scribendi_style', SCRIBENDI_PLUGIN_URL.'/css/scribendi.css', null, '1.1', 'screen');
 
 /*
  * Register admin menu and header components
