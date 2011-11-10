@@ -151,7 +151,7 @@ jQuery(document).ready(function($) {
 	if ( $('#scribendi-quote').length > 0 ) {
 		bindQuoteLink($);
 	}
-	
+
 	bindOrderActions($);
 <?php
 	if ( isset($_GET['scribendi_request_edit']) && $_GET['scribendi_request_edit'] ) {
@@ -215,14 +215,29 @@ function bindOrderHandlers($) {
 		$.post(ajaxurl, data, function(response) {
 			$('#scribendi-order-details').html(response);
 			$('#scribendi-quote-details').html('');
-			$('#scribendi-get-quotes').remove();
+			$('#scribendi-get-quotes').hide();
 			bindOrderActions($);
+
+			if ( $('input.button-primary.scribendi-order-service').length > 0 ) {
+				$('div.paymentRequired').find('input.button-primary.scribendi-order-service').remove();
+				$('input.button-primary.scribendi-order-service').clone().appendTo('div.paymentRequired').click(function(){
+					$('div.paymentRequired').dialog('close');
+				});
+
+				$('div.paymentRequired').dialog({
+					dialogClass: 'wp-dialog',
+					modal: true,
+					width: '450px',
+					closeOnEscape: true
+				});
+			}
+
 			return false;
 		});
 		
 		return false;
 	});
-};
+}
 
 function bindOrderActions($) {
 	if ( $('#scribendi-order-cancel').length > 0 ) {
@@ -242,12 +257,28 @@ function bindOrderActions($) {
 				bindOrderActions($);
 				bindQuoteLink($);
 			});
+
+			$('#scribendi-get-quotes').show();
 			
 			return false;
 		});
-	};
-};
+	}
+}
 </script>
+<?php
+}
+
+/**
+ * Hidden templates to be used with jQuery UI dialog()
+ *
+ * @return void
+ */
+function scribendi_dialog_templates() {
+?>
+<div class="paymentRequired" title="Payment Required" style="padding: 5px; display: none;">
+	<p><?php _e('Your order has been placed and now requires payment before it will be processed.', 'scribendi');?></p>
+	<p><?php _e('To proceed to our secure payment page, click Make Payment below.', 'scribendi');?></p>
+</div>
 <?php
 }
 
@@ -375,7 +406,7 @@ function scribendi_display_order(Scribendi_Api_Model_Order $oOrder) {
 				</td>
 				<td></td>
 				<td class="right">
-					<input name="scribendi_order" type="submit" class="button-primary scribendi-order-service" value="<?php esc_attr_e('Make Payment'); ?>" onclick="<?php scribendi_payment_window($oOrder); ?>; return false;" />
+					<input name="scribendi_order" type="submit" class="button-primary scribendi-order-service" value="<?php esc_attr_e('Make Payment'); ?>" onclick="<?php scribendi_payment_window($oOrder); ?> return false;" />
 				</td>
 			</tr>
 		<?php endif; ?>
@@ -439,20 +470,6 @@ function scribendi_display_order_status(Scribendi_Api_Model_Order $inOrder) {
 	<?php echo $message; ?>
 </div>
 <?php	
-}
-
-/**
- * Adds the javascript to the output to trigger payment requestor
- *
- * @param Scribendi_Api_Model_Order $inOrder
- * @return void
- */
-function scribendi_trigger_payment(Scribendi_Api_Model_Order $inOrder) {
-?>
-<script type="text/javascript" >
-<?php scribendi_payment_window($inOrder); ?>
-</script>
-<?php
 }
 
 /**

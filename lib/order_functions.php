@@ -137,9 +137,7 @@ function scribendi_order() {
 			
 			scribendi_store_order_object($oPost->ID, $oOrder);
 			scribendi_display_order($oOrder);
-			if ( $getPayment ) {
-				scribendi_trigger_payment($oOrder);
-			}
+
 			if ( $getPaymentCredit ) {
 				scribendi_trigger_payment_credit($oOrder);
 			}

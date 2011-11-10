@@ -75,6 +75,8 @@ There are currently no upgrade issues.
 2. Order from your posts screen.
 
 == Changelog ==
+= 1.2 =
+* Fixed an issue with Chrome browser support
 
 = 1.1 =
 * Update for WordPress 3.2
@@ -83,6 +85,9 @@ There are currently no upgrade issues.
 * First release
 
 == Upgrade Notice ==
+
+= 1.2 =
+Recommended Update. Resolves compatibility issues with Chrome.
 
 = 1.1 =
 Recommended Update. Resolves compatibility issues with WordPress 3.2
