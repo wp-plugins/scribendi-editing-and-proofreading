@@ -1,7 +1,7 @@
 /**
  * Additional style declarations needed by the Scribendi.com plugin
  *
- * Version: 1.2.0
+ * Version: 2.0.0
  * Author: Scribendi.com
  * Author URI: http://www.scribendi.com/
  */
@@ -17,6 +17,7 @@ table.scribendi-quotes tbody td { padding: 2px; }
 table.scribendi-quotes tbody td.center { text-align: center; }
 table.scribendi-quotes tbody td.right { text-align: right; }
 table.scribendi-quotes tbody td.left { text-align: left; }
-
 .post-revisions .scribendi-highlight { padding: 5px; background-color: #efe; }
 .post-revisions .scribendi-highlight td { border-top: 1px solid #090; border-bottom: 1px solid #090; }
+#scribendi-account-lookup .error { border: 1px solid #f00; font-weight: bold; padding: 5px; }
+input.scribendi_disabled, textarea.scribendi_disabled { background-color: #eee !important; color: #333; }

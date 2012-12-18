@@ -6,6 +6,26 @@
  */
 
 /**
+ * Adds the required CSS resources
+ *
+ * @return void
+ */
+function scribendi_enqueue_styles() {
+	wp_enqueue_style('scribendi_style', SCRIBENDI_PLUGIN_URL.'/css/scribendi.css', null, '1.2', 'screen');
+	wp_enqueue_style('wp-jquery-ui-dialog');
+}
+
+/**
+ * Adds the required JS scripts
+ *
+ * @return void
+ */
+function scribendi_enqueue_scripts() {
+	wp_enqueue_script('jquery-ui-dialog');
+	wp_enqueue_script('jquery-blockUI', SCRIBENDI_PLUGIN_URL . '/js/jquery.blockUI.js', 'jquery', '2.53', true );
+}
+
+/**
  * Create menu entry in the "Settings" section
  *
  * @return void
@@ -188,11 +208,29 @@ function scribendi_toolbox_builder($post) {
 	echo '</p>';
 
 	/*
-	 * Only add controls if the post has been saved already
+	 * Only add controls if good API details have been provided and the post has been saved already
 	 */
-	if ( $post->post_status == 'auto-draft' ) {
+
+    // Test API Settings
+    $api_test = scribendi_test_api_settings();
+
+    if($api_test instanceof Exception) {
+
+        echo '<p>';
+        _e('You must provide valid API details before you can use this plugin.
+            Please verify you have entered your details correctly and have confirmed your
+            email address during the registration process.', 'scribendi');
+        echo '</p><p>';
+        echo '<a href="' . get_bloginfo('url') . '/wp-admin/options-general.php?page=scribendi-settings-config">';
+        _e('Click Here', 'scribendi');
+        echo '</a>';
+        _e(' to register or manage your settings.', 'scribendi');
+
+    } elseif ( $post->post_status == 'auto-draft' ) {
+
 		scribendi_display_toolbox_not_available();
-	} else {
+
+	}  else {
 		/*
 		 * Fetch order object, always returns object regardless of status
 		 */

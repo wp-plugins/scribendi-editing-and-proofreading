@@ -19,106 +19,189 @@ function scribendi_settings_page() {
 		<form method="post" action="options.php">
 			<?php settings_fields('scribendi-settings-group'); ?>
 			<p><?php _e('These are the main settings for the plugin.', 'scribendi'); ?></p>
-			<p><?php _e('You must first <a href="https://www.scribendi.com/api" target="_blank">register with Scribendi.com</a> and obtain an API key before you can use this plugin.', 'scribendi'); ?></p>
+
+            <?php if (!get_option(SCRIBENDI_PUBLIC_KEY)): ?>
+			    <p class="api-first"><?php _e('You must first <a href="https://www.scribendi.com/api" target="_blank" id="scribendi-register">register with Scribendi.com</a> and obtain an API key before you can use this plugin.', 'scribendi'); ?></p>
+            <?php endif; ?>
+
 			<p><?php _e('For detailed instructions on how to use the Scribendi plugin, please visit <a href="http://www.scribendi.com/wordpress_plugin" target="_blank">www.Scribendi.com/wordpress_plugin</a>.', 'scribendi'); ?></p>
-			
-			<h3><?php _e('Account and Default Settings', 'scribendi') ?></h3>
+
+			<?php if (!get_option(SCRIBENDI_PUBLIC_KEY)): ?>
+                <p class="submit api-reg">
+                    <a href="https://www.scribendi.com/api" id="scribendi-reg-new" class="button-primary"><?php _e('I am a New Customer') ?></a>
+                    &nbsp;&nbsp;&nbsp;&nbsp;
+                    <a href="https://www.scribendi.com/api" id="scribendi-reg-existing" class="button-primary"><?php _e('I am an Existing Customer') ?></a>
+                </p>
+			<?php endif; ?>
+
+
+            <!-- PREFERENCES --------------------------------------------------------------------------------------->
+            <h3><?php _e('Preferences', 'scribendi') ?></h3>
+            <table class="form-table">
+
+                <tr valign="top">
+                    <th scope="row"><label for="<?php echo SCRIBENDI_DEFAULT_CURRENCY; ?>"><?php _e('Default Currency', 'scribendi') ?></label></th>
+                    <td>
+                        <select name="<?php echo SCRIBENDI_DEFAULT_CURRENCY; ?>" id="<?php echo SCRIBENDI_DEFAULT_CURRENCY; ?>" size="1">
+                            <?php foreach ( scribendi_get_currencies() as $oCurrency ): ?>
+                            <option value="<?php echo $oCurrency->getCurrencyId(); ?>" <?php if ( get_option(SCRIBENDI_DEFAULT_CURRENCY, 840) == $oCurrency->getCurrencyId() ) { echo 'selected="selected"'; }?>><?php echo $oCurrency->getDescription(); ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </td>
+                </tr>
+                <tr valign="top">
+                    <th scope="row"><label for="<?php echo SCRIBENDI_DEFAULT_ENGLISH; ?>"><?php _e('Default English Version', 'scribendi') ?></label></th>
+                    <td>
+                        <select name="<?php echo SCRIBENDI_DEFAULT_ENGLISH; ?>" id="<?php echo SCRIBENDI_DEFAULT_ENGLISH; ?>" size="1">
+                            <?php foreach ( scribendi_get_english_types() as $type ): ?>
+                            <option value="<?php echo $type; ?>" <?php if ( get_option(SCRIBENDI_DEFAULT_ENGLISH, 'US') == $type ) { echo 'selected="selected"'; }?>><?php echo $type; ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </td>
+                </tr>
+                <tr valign="top">
+                    <th scope="row"><label for="<?php echo SCRIBENDI_ALWAYS_POST_EDITS; ?>"><?php _e('Automatically Publish Edited Posts', 'scribendi') ?></label></th>
+                    <td>
+                        <input type="checkbox" name="<?php echo SCRIBENDI_ALWAYS_POST_EDITS; ?>" id="<?php echo SCRIBENDI_ALWAYS_POST_EDITS; ?>" value="1" <?php if ( get_option(SCRIBENDI_ALWAYS_POST_EDITS, 0) ) { echo 'checked="checked"'; } ?> />
+                    </td>
+                </tr>
+
+            </table><!-- .form-table -->
+
+            <p class="submit"><input type="submit" class="button-primary" name="Submit" value="<?php _e('Save Changes') ?>" /></p>
+
+
+            <!-- ACCOUNT SETTINGS --------------------------------------------------------------------------------->
+			<h3><?php _e('Account Settings', 'scribendi') ?></h3>
+            <p><?php _e('Please use the registration buttons above to configure your API key. You should not need to edit these fields.', 'scribendi'); ?></p>
 			<?php if ( get_option(SCRIBENDI_PUBLIC_KEY) ): ?>
 				<?php $result = scribendi_test_api_settings(); ?>
 				<?php if ( $result === true ):?>
 					<div id='scribendi-api-settings-test' class='updated settings-error'>
 						<p><strong><?php _e('Your API settings are correct.', 'scribendi');?></strong></p>
 					</div>
-				<?php elseif ( $result instanceof Exception ):?>
+				<?php elseif ( $result instanceof Exception ): ?>
 					<div id='scribendi-api-settings-test' class='error settings-error'>
 						<p>
-							<strong><?php _e('There was an error while testing your settings: ', 'scribendi'); ?></strong>
-							<?php echo '<br />', $result->getMessage(); ?>
+							<strong><?php _e('There was an error while testing your API settings: ', 'scribendi'); ?></strong>
+							<?php echo '<br />', $result->getMessage() . '.'; ?>
+                            <?php _e('<br />Please make sure you have completed the registration process and confirmed your email address in order to activate your public API key.', 'scribendi'); ?>
 						</p>
 					</div>
 				<?php endif; ?>
 			<?php endif; ?>
 			<table class="form-table">
+
 				<tr valign="top">
 					<th scope="row"><label for="<?php echo SCRIBENDI_PUBLIC_KEY; ?>"><?php _e('Public Key', 'scribendi') ?></label></th>
-					<td><input name="<?php echo SCRIBENDI_PUBLIC_KEY; ?>" type="text" id="<?php echo SCRIBENDI_PUBLIC_KEY; ?>" value="<?php echo get_option(SCRIBENDI_PUBLIC_KEY); ?>" class="regular-text" /></td>
+					<td><input name="<?php echo SCRIBENDI_PUBLIC_KEY; ?>" type="text" id="<?php echo SCRIBENDI_PUBLIC_KEY; ?>" value="<?php echo get_option(SCRIBENDI_PUBLIC_KEY); ?>" class="regular-text scribendi_disabled" readonly="readonly" /></td>
 				</tr>
 				<tr valign="top">
 					<th scope="row"><label for="<?php echo SCRIBENDI_PRIVATE_KEY; ?>"><?php _e('Private Key', 'scribendi') ?></label></th>
-					<td><input name="<?php echo SCRIBENDI_PRIVATE_KEY; ?>" type="text" id="<?php echo SCRIBENDI_PRIVATE_KEY; ?>" value="<?php echo get_option(SCRIBENDI_PRIVATE_KEY); ?>" class="regular-text" /></td>
+					<td><input name="<?php echo SCRIBENDI_PRIVATE_KEY; ?>" type="text" id="<?php echo SCRIBENDI_PRIVATE_KEY; ?>" value="<?php echo get_option(SCRIBENDI_PRIVATE_KEY); ?>" class="regular-text scribendi_disabled" readonly="readonly" /></td>
 				</tr>
 				<tr valign="top">
 					<th scope="row"><label for="<?php echo SCRIBENDI_CUSTOMER_ID; ?>"><?php _e('Customer ID', 'scribendi') ?></label></th>
-					<td><input name="<?php echo SCRIBENDI_CUSTOMER_ID; ?>" type="text" id="<?php echo SCRIBENDI_CUSTOMER_ID; ?>" value="<?php echo get_option(SCRIBENDI_CUSTOMER_ID); ?>" class="small-text" /></td>
+					<td><input name="<?php echo SCRIBENDI_CUSTOMER_ID; ?>" type="text" id="<?php echo SCRIBENDI_CUSTOMER_ID; ?>" value="<?php echo get_option(SCRIBENDI_CUSTOMER_ID); ?>" class="small-text scribendi_disabled" readonly="readonly" /></td>
 				</tr>
-				<tr valign="top">
-					<th scope="row"><label for="<?php echo SCRIBENDI_DEFAULT_CURRENCY; ?>"><?php _e('Default Currency', 'scribendi') ?></label></th>
-					<td>
-						<select name="<?php echo SCRIBENDI_DEFAULT_CURRENCY; ?>" id="<?php echo SCRIBENDI_DEFAULT_CURRENCY; ?>" size="1">
-							<?php foreach ( scribendi_get_currencies() as $oCurrency ): ?>
-							<option value="<?php echo $oCurrency->getCurrencyId(); ?>" <?php if ( get_option(SCRIBENDI_DEFAULT_CURRENCY, 840) == $oCurrency->getCurrencyId() ) { echo 'selected="selected"'; }?>><?php echo $oCurrency->getDescription(); ?></option>
-							<?php endforeach; ?>
-						</select>
-					</td>
-				</tr>
-				<tr valign="top">
-					<th scope="row"><label for="<?php echo SCRIBENDI_DEFAULT_ENGLISH; ?>"><?php _e('Default English Version', 'scribendi') ?></label></th>
-					<td>
-						<select name="<?php echo SCRIBENDI_DEFAULT_ENGLISH; ?>" id="<?php echo SCRIBENDI_DEFAULT_ENGLISH; ?>" size="1">
-							<?php foreach ( scribendi_get_english_types() as $type ): ?>
-							<option value="<?php echo $type; ?>" <?php if ( get_option(SCRIBENDI_DEFAULT_ENGLISH, 'US') == $type ) { echo 'selected="selected"'; }?>><?php echo $type; ?></option>
-							<?php endforeach; ?>
-						</select>
-					</td>
-				</tr>
-				<tr valign="top">
-					<th scope="row"><label for="<?php echo SCRIBENDI_ALWAYS_POST_EDITS; ?>"><?php _e('Automatically Publish Edited Posts', 'scribendi') ?></label></th>
-					<td>
-						<input type="checkbox" name="<?php echo SCRIBENDI_ALWAYS_POST_EDITS; ?>" id="<?php echo SCRIBENDI_ALWAYS_POST_EDITS; ?>" value="1" <?php if ( get_option(SCRIBENDI_ALWAYS_POST_EDITS, 0) ) { echo 'checked="checked"'; } ?> />
-					</td>
-				</tr>
-			</table>
-			
+
+			</table><!-- .form-table -->
+
+
+            <!-- SERVER SETTINGS ----------------------------------------------------------------------------------->
 			<h3><?php _e('Server Settings', 'scribendi') ?></h3>
-			<p><?php _e('These settings are used to connect to the API server. You should not need to change them.', 'scribendi'); ?></p>
+			<p><?php _e('You should not need to edit these fields.', 'scribendi'); ?></p>
 			<table class="form-table">
+
 				<tr valign="top">
 					<th scope="row"><label for="<?php echo SCRIBENDI_API_SERVER; ?>"><?php _e('API Server Address', 'scribendi') ?></label></th>
-					<td><input name="<?php echo SCRIBENDI_API_SERVER; ?>" type="text" id="<?php echo SCRIBENDI_API_SERVER; ?>" value="<?php echo get_option(SCRIBENDI_API_SERVER, 'https://www.scribendi.com'); ?>" class="regular-text" /></td>
+					<td><input name="<?php echo SCRIBENDI_API_SERVER; ?>" type="text" id="<?php echo SCRIBENDI_API_SERVER; ?>" value="<?php echo get_option(SCRIBENDI_API_SERVER, 'https://www.scribendi.com'); ?>" class="regular-text scribendi_disabled" readonly="readonly" /></td>
 				</tr>
+                <tr valign="top">
+                    <th scope="row"><label for="<?php echo SCRIBENDI_API_PAYMENT_SERVER; ?>"><?php _e('Payment Server', 'scribendi') ?></label></th>
+                    <td><input name="<?php echo SCRIBENDI_API_PAYMENT_SERVER; ?>" type="text" id="<?php echo SCRIBENDI_API_PAYMENT_SERVER; ?>" value="<?php echo get_option(SCRIBENDI_API_PAYMENT_SERVER, 'https://www.scribendi.com/checkout?oid='); ?>" class="regular-text scribendi_disabled" readonly="readonly" /></td>
+                </tr>
+                <tr valign="top">
+                    <th scope="row"><label for="<?php echo SCRIBENDI_API_ORDER_SERVER; ?>"><?php _e('Order Server', 'scribendi') ?></label></th>
+                    <td><input name="<?php echo SCRIBENDI_API_ORDER_SERVER; ?>" type="text" id="<?php echo SCRIBENDI_API_ORDER_SERVER; ?>" value="<?php echo get_option(SCRIBENDI_API_ORDER_SERVER, 'https://www.scribendi.com/customer?view=cp_order_details&oid='); ?>" class="regular-text scribendi_disabled" readonly="readonly" /></td>
+                </tr>
 				<tr valign="top">
 					<th scope="row"><label for="<?php echo SCRIBENDI_API_CONN_TIMEOUT; ?>"><?php _e('API Connection Time-out', 'scribendi') ?></label></th>
-					<td><input name="<?php echo SCRIBENDI_API_CONN_TIMEOUT; ?>" type="text" id="<?php echo SCRIBENDI_API_CONN_TIMEOUT; ?>" value="<?php echo get_option(SCRIBENDI_API_CONN_TIMEOUT, 10); ?>" class="small-text" /></td>
+					<td><input name="<?php echo SCRIBENDI_API_CONN_TIMEOUT; ?>" type="text" id="<?php echo SCRIBENDI_API_CONN_TIMEOUT; ?>" value="<?php echo get_option(SCRIBENDI_API_CONN_TIMEOUT, 10); ?>" class="small-text scribendi_disabled" readonly="readonly" /><?php _e(' seconds', 'scribendi'); ?></td>
 				</tr>
 				<tr valign="top">
 					<th scope="row"><label for="<?php echo SCRIBENDI_API_TIMEOUT; ?>"><?php _e('API Request Time-out', 'scribendi') ?></label></th>
-					<td><input name="<?php echo SCRIBENDI_API_TIMEOUT; ?>" type="text" id="<?php echo SCRIBENDI_API_TIMEOUT; ?>" value="<?php echo get_option(SCRIBENDI_API_TIMEOUT, 10); ?>" class="small-text" /></td>
-				</tr>
-				<tr valign="top">
-					<th scope="row"><label for="<?php echo SCRIBENDI_API_PAYMENT_SERVER; ?>"><?php _e('Payment Server', 'scribendi') ?></label></th>
-					<td><input name="<?php echo SCRIBENDI_API_PAYMENT_SERVER; ?>" type="text" id="<?php echo SCRIBENDI_API_PAYMENT_SERVER; ?>" value="<?php echo get_option(SCRIBENDI_API_PAYMENT_SERVER, 'https://www.scribendi.com/checkout?oid='); ?>" class="regular-text" /></td>
-				</tr>
-				<tr valign="top">
-					<th scope="row"><label for="<?php echo SCRIBENDI_API_ORDER_SERVER; ?>"><?php _e('Order Server', 'scribendi') ?></label></th>
-					<td><input name="<?php echo SCRIBENDI_API_ORDER_SERVER; ?>" type="text" id="<?php echo SCRIBENDI_API_ORDER_SERVER; ?>" value="<?php echo get_option(SCRIBENDI_API_ORDER_SERVER, 'https://www.scribendi.com/customer?view=cp_order_details&oid='); ?>" class="regular-text" /></td>
+					<td><input name="<?php echo SCRIBENDI_API_TIMEOUT; ?>" type="text" id="<?php echo SCRIBENDI_API_TIMEOUT; ?>" value="<?php echo get_option(SCRIBENDI_API_TIMEOUT, 10); ?>" class="small-text scribendi_disabled" readonly="readonly" /><?php _e(' seconds', 'scribendi'); ?></td>
 				</tr>
 				<tr valign="top">
 					<th scope="row"><label for="<?php echo SCRIBENDI_API_STATUS_INTERVAL; ?>"><?php _e('Status Refresh Interval', 'scribendi') ?></label></th>
-					<td><input name="<?php echo SCRIBENDI_API_STATUS_INTERVAL; ?>" type="text" id="<?php echo SCRIBENDI_API_STATUS_INTERVAL; ?>" value="<?php echo get_option(SCRIBENDI_API_STATUS_INTERVAL, '15'); ?>" class="small-text" /> minutes</td>
+					<td><input name="<?php echo SCRIBENDI_API_STATUS_INTERVAL; ?>" type="text" id="<?php echo SCRIBENDI_API_STATUS_INTERVAL; ?>" value="<?php echo get_option(SCRIBENDI_API_STATUS_INTERVAL, '15'); ?>" class="small-text scribendi_disabled" readonly="readonly" /><?php _e(' minutes', 'scribendi'); ?></td>
 				</tr>
-			</table>
+
+			</table><!-- .form-table -->
 			
-			<p class="submit"><input type="submit" class="button-primary" name="Submit" value="<?php _e('Save Changes') ?>" /></p>
+			<p class="submit">
+
+                <a href="#" id="scribendi-advanced-settings" class="button-primary"><?php _e('Edit Advanced Settings') ?></a>
+
+                <input type="submit" class="button-primary" name="Submit" value="<?php _e('Save Changes') ?>" />
+
+            </p>
 
 			<p><?php _e('Questions, problems or comments? <a href="http://www.scribendi.com/contact" target="_blank">Contact Scribendi.com</a> for assistance.', 'scribendi'); ?></p>
 		</form>
 	</div>
+
+    <script type="text/javascript" >
+
+        jQuery(document).ready(function($) {
+
+            // Handle Advanced Settings Enable
+            $('#scribendi-advanced-settings').click(function(e){
+
+                e.preventDefault();
+
+                disabled_inputs = $('.scribendi_disabled');
+
+                if(disabled_inputs.length) {
+
+                    adv_confirm = confirm("These settings should only be adjusted if recommended by Scribendi technical support.  Adjusting them may cause the plugin to stop working.");
+
+                    if(adv_confirm == true) {
+                        disabled_inputs.each(function() {
+
+                            $(this).removeClass('scribendi_disabled');
+                            $(this).removeAttr('readonly');
+
+                        });
+                    }
+                }
+            });
+
+            // Create IE + others compatible event handler
+            var eventMethod = window.addEventListener ? "addEventListener" : "attachEvent";
+            var eventer = window[eventMethod];
+            var messageEvent = eventMethod == "attachEvent" ? "onmessage" : "message";
+
+            // Listen for message from child window (iFrame)
+            eventer(messageEvent, function(e) {
+
+                if(e.data == 'close-iframe') {
+
+                    $('div.scribendiDialog').dialog('close');
+                }
+
+            }, false);
+
+        });
+    </script>
 <?php
 }
 
 /**
  * Displays the Scribendi user settings options
  *
+ * @param object $user
  * @return void
  */
 function scribendi_user_settings_page($user) {
@@ -147,12 +230,62 @@ function scribendi_user_settings_page($user) {
 function scribendi_ajax_calls() {
 ?>
 <script type="text/javascript" >
+
+// Assign registration token to global variable
+var regKey = "<?php echo scribendi_generate_reg_key(); ?>";
+
 jQuery(document).ready(function($) {
+
 	if ( $('#scribendi-quote').length > 0 ) {
 		bindQuoteLink($);
 	}
 
 	bindOrderActions($);
+
+	if ( $('#scribendi-register').length > 0 ) {
+		$('#scribendi-register').click(function(e){
+			e.stopPropagation();
+
+			$('div.scribendiRegisterOptions').dialog({
+				dialogClass: 'wp-dialog',
+				modal: true,
+				width: '450',
+				closeOnEscape: true,
+				zIndex: 999999,
+				buttons: [
+					{
+						text: 'I am new to Scribendi.com',
+						'class': 'button-primary',
+						click: function() {
+							scribendiRegisterDialog($);
+							$(this).dialog('close');
+						}
+					},
+					{
+						text: 'I am an existing customer',
+						'class': 'button-primary',
+						click: function() {
+							scribendiLoginDialog($);
+							$(this).dialog('close');
+						}
+					}
+				]
+			});
+
+			return false;
+		});
+
+		$('#scribendi-reg-new').click(function(e) {
+			scribendiRegisterDialog($);
+			e.stopPropagation();
+			return false;
+		});
+		$('#scribendi-reg-existing').click(function(e) {
+			scribendiLoginDialog($);
+			e.stopPropagation();
+			return false;
+		});
+	}
 <?php
 	if ( isset($_GET['scribendi_request_edit']) && $_GET['scribendi_request_edit'] ) {
 ?>
@@ -163,6 +296,99 @@ jQuery(document).ready(function($) {
 	}
 ?>
 });
+
+function scribendiRegisterDialog($) {
+
+    var register_iframe_wrap = $('div.scribendiRegisterDialog');
+    var register_iframe = $("iframe", register_iframe_wrap);
+    var register_iframe_src = "<?php echo get_option(SCRIBENDI_API_SERVER, 'https://www.scribendi.com'); ?>/api_plugin_register?action=reg&key=" + regKey + "&source=<?php echo SCRIBENDI_PLUGIN_SOURCE; ?>";
+
+    register_iframe.attr("src", register_iframe_src);
+
+	register_iframe_wrap.dialog({
+		dialogClass: 'wp-dialog',
+		modal: true,
+        zIndex: 999999,
+		width: '740',
+		height: '640',
+		closeOnEscape: true,
+		close: function(event, ui) {
+			scribendiPollKeyUpdate($, scribendiGetKey($(this)));
+		}
+	});
+}
+
+function scribendiLoginDialog($) {
+
+	var login_iframe_wrap = $('div.scribendiLoginDialog');
+    var login_iframe = $("iframe", login_iframe_wrap);
+    var login_iframe_src = "<?php echo get_option(SCRIBENDI_API_SERVER, 'https://www.scribendi.com'); ?>/api_plugin_register?action=reglogin&key=" + regKey + "&source=<?php echo SCRIBENDI_PLUGIN_SOURCE; ?>";
+
+    login_iframe.attr("src", login_iframe_src);
+
+	login_iframe_wrap.dialog({
+		dialogClass: 'wp-dialog',
+		modal: true,
+        zIndex: 999999,
+		width: '740',
+		height: '640',
+		closeOnEscape: true,
+		close: function(event, ui) {
+
+            $.blockUI({
+                message: '<h1 style="font-family: Helvetica, Arial, SANS-SERIF;">Saving API Details...</h1>',
+                fadeIn: 700,
+                fadeOut: 700,
+                css: {
+                    padding: '5px',
+                    'border-radius': '10px',
+                    '-webkit-border-radius': '10px',
+                    '-moz-border-radius': '10px',
+                    'border-color': '#3384CD'
+                }
+            });
+
+			scribendiPollKeyUpdate($, scribendiGetKey($(this)));
+		}
+	});
+}
+
+function scribendiGetKey(ele) {
+	var res = ele.find('iframe').attr('src').match(/key=(\w+)/gi);
+	var key = null;
+	if ( null !== res ) {
+		key = res[0].replace('key=', '');
+	}
+	return key;
+}
+
+function scribendiPollKeyUpdate($, key) {
+
+	var data = {
+		action: 'scribendi_key_check',
+		key: key,
+		time: function() {
+			var dt = new Date();
+			return dt.getTime();
+		}
+	};
+
+	$.post(ajaxurl, data, function(return_data, status) {
+
+		if ( status != 'success' ) {
+			setTimeout(scribendiPollKeyUpdate(key), 250);
+		} else {
+			var data = $.parseJSON(return_data);
+			$('#scribendi_publickey').val(data.public_key);
+            $('#scribendi_privatekey').val(data.private_key);
+            $('#scribendi_cid').val(data.client_id);
+			$('p.api-first').hide();
+            $('p.api-reg').hide();
+
+            $.unblockUI();
+		}
+	});
+}
 
 function bindQuoteLink($) {
 	$('#scribendi-quote').click(function(){
@@ -227,6 +453,7 @@ function bindOrderHandlers($) {
 				$('div.paymentRequired').dialog({
 					dialogClass: 'wp-dialog',
 					modal: true,
+                    zIndex: 999999,
 					width: '450px',
 					closeOnEscape: true
 				});
@@ -278,6 +505,30 @@ function scribendi_dialog_templates() {
 <div class="paymentRequired" title="Payment Required" style="padding: 5px; display: none;">
 	<p><?php _e('Your order has been placed and now requires payment before it will be processed.', 'scribendi');?></p>
 	<p><?php _e('To proceed to our secure payment page, click Make Payment below.', 'scribendi');?></p>
+</div>
+
+<div class="scribendiRegisterOptions" title="Scribendi.com Account Options" style="padding: 5px; display: none;">
+	<p><?php _e('The Scribendi.com plugin requires an account with a valid API key.', 'scribendi');?></p>
+	<p><?php _e('If you have previously registered, you can lookup your account and API details at <a href="https://www.scribendi.com/customer?view=cp_profile_api" target="_blank">Scribendi.com</a>.', 'scribendi');?></p>
+	<p>
+		<?php _e('Otherwise, you can create a new account. Your details are kept confidential (see our <a href="https://www.scribendi.com/privacy" target="_blank">Privacy Policy</a> for details).', 'scribendi');?>
+		<?php _e('The inline registration process is hosted on our secure server.', 'scribendi'); ?>
+	</p>
+	<p><?php _e('Not happy registering via the plugin? <a href="https://www.scribendi.com/api" target="_blank">Then go direct to our site</a> (opens in new window) and register there.', 'scribendi');?></p>
+</div>
+
+<div class="scribendiRegisterDialog scribendiDialog" title="Register with Scribendi.com" style="padding: 5px; display: none;">
+	<iframe frameborder="0" scrolling="auto" width="100%" height="100%" src="">
+		<p>Sorry, but you need iframe support to continue.</p>
+		<p>Please register at <a href="https://www.scribendi.com/api" target="_blank">Scribendi.com</a>.</p>
+	</iframe>
+</div>
+
+<div class="scribendiLoginDialog scribendiDialog" title="Existing Customer Login to Scribendi.com" style="padding: 5px; display: none;">
+	<iframe frameborder="0" scrolling="auto" width="100%" height="100%" src="">
+		<p>Sorry, but you need iframe support to continue.</p>
+		<p>Please register at <a href="https://www.scribendi.com/api" target="_blank">Scribendi.com</a>.</p>
+	</iframe>
 </div>
 <?php
 }
@@ -439,6 +690,8 @@ function scribendi_payment_window(Scribendi_Api_Model_Order $inOrder) {
  * @return void
  */
 function scribendi_display_order_status(Scribendi_Api_Model_Order $inOrder) {
+	$message = '';
+
 	switch ( $inOrder->getStatus() ) {
 		case Scribendi_Api_Model_Order::STATUS_RETURNED:
 		case Scribendi_Api_Model_Order::STATUS_DONE:

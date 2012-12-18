@@ -1,8 +1,8 @@
 <?php
 /**
- * Scribendi API Client for PHP (v1.1) - Single File
+ * Scribendi API Client for PHP (v1.2) - Single File
  *
- * Copyright (C) 2010-2011 Scribendi Inc.
+ * Copyright (C) 2010-2012 Scribendi Inc.
  *
  * Use of this software program, and use of Scribendi's API and services
  * are governed by the SCRIBENDI INC. API LICENSE AGREEMENT.
@@ -15,7 +15,6 @@
  * LICENSE AGREEMENT always applies to your use of Scribendi's API and 
  * services. 
  */
-
 class Scribendi_Api_Exception extends Exception {
 }
 class Scribendi_Api_Client_Exception extends Scribendi_Api_Exception {
@@ -376,7 +375,7 @@ class Scribendi_Api_Client {
 }
 class Scribendi_Api_Constants {
 	private function __construct() {}
-	const API_CLIENT_VERSION = '1.1.0';
+	const API_CLIENT_VERSION = '1.2.0';
 	const API_REQUEST_POST = 'POST';
 	const API_REQUEST_GET = 'GET';
 	const API_ROOT_PATH = '/rest/';
@@ -393,6 +392,7 @@ class Scribendi_Api_Constants {
 	const FIELD_OFFSET = 'offset';
 	const FIELD_LIMIT = 'limit';
 	const FIELD_CATEGORY_ID = 'categoryid';
+	const FIELD_COUNTRY_ID = 'countryid';
 	const FIELD_CURRENCY_ID = 'currencyid';
 	const FIELD_SERVICE_ID = 'serviceid';
 	const FIELD_WORD_COUNT = 'wordcount';
@@ -450,6 +450,11 @@ class Scribendi_Api_DateTime extends DateTime implements Serializable {
 	}
 	static function getInstanceUtc($inTime = 'now') {
 		$oTimezone = new DateTimeZone('UTC');
+		$oObject = new Scribendi_Api_DateTime($inTime, $oTimezone);
+		return $oObject;
+	}
+	static function getInstanceEst($inTime = 'now') {
+		$oTimezone = new DateTimeZone('America/Toronto');
 		$oObject = new Scribendi_Api_DateTime($inTime, $oTimezone);
 		return $oObject;
 	}
@@ -1393,7 +1398,6 @@ abstract class Scribendi_Api_Client_Adaptor_Abstract {
 		}
 	}
 	function isValid() {
-		$valid = true;
 		$target = count($this->getRequiredParameters());
 		$matched = array();
 		foreach ( $this->getRequiredParameters() as $parameter ) {
@@ -1401,7 +1405,7 @@ abstract class Scribendi_Api_Client_Adaptor_Abstract {
 				$matched[] = $parameter;
 			}
 		}
-			if ( $target !== count($matched) ) {
+		if ( $target !== count($matched) ) {
 			throw new Scribendi_Api_Client_Exception(
 				'Missing required query parameter(s): '.implode(', ', array_diff($this->getRequiredParameters(), $matched))
 			);
@@ -1414,14 +1418,22 @@ abstract class Scribendi_Api_Client_Adaptor_Abstract {
 		$oTransport->setRequestServer($this->getRequestServer());
 		$oTransport->setRequestUri($this->getRequestUri());
 		$oTransport->setTransportOptions($this->getTransportOptions());
-			$response = $oTransport->call();
-			$oResponse = new $this->_ResponseHandler($response);
+		$response = $oTransport->call();
+		$oResponse = new $this->_ResponseHandler($response);
 		$oResponse->handleResponse();
 		return $oResponse;
 	}
 	function getRequestSignature($inType = Scribendi_Api_Constants::API_REQUEST_GET) {
 		return $this->getApiAuth()->createSignature(
 			$inType, $this->getApiQuery()->getQueryDate(), $this->getRequestUri() 
+		);
+	}
+	function setPostParameters() {
+		$this->getTransportOptions()->setOptions(
+			array(
+				CURLOPT_POST => true,
+				CURLOPT_POSTFIELDS => $this->getApiQuery()->getQuery(),
+			)
 		);
 	}
 	function isModified() {
@@ -1544,7 +1556,7 @@ abstract class Scribendi_Api_Client_Adaptor_Abstract {
 		return $this;
 	}
 }
-class Scribendi_Api_Client_Adaptor_Currency extends Scribendi_Api_Client_Adaptor_Abstract {	
+class Scribendi_Api_Client_Adaptor_Currency extends Scribendi_Api_Client_Adaptor_Abstract {
 	protected function initialise() {
 		$this->setName('currency');
 		$this->setResponseHandler('Scribendi_Api_Client_Response_Currency');
@@ -1633,14 +1645,6 @@ class Scribendi_Api_Client_Adaptor_Order extends Scribendi_Api_Client_Adaptor_Ab
 			break;
 		}
 		return true;
-	}
-	private function setPostParameters() {
-		$this->getTransportOptions()->setOptions(
-			array(
-				CURLOPT_POST => true,
-				CURLOPT_POSTFIELDS => $this->getApiQuery()->getQuery(),
-			)
-		);
 	}
 	function listOrders($inClientID = null) {
 		if ( $inClientID === null ) {
@@ -1856,7 +1860,7 @@ class Scribendi_Api_Client_Adaptor_Quote extends Scribendi_Api_Client_Adaptor_Ab
 				Scribendi_Api_Constants::FIELD_REQUEST_SIGNATURE => $this->getRequestSignature('GET')
 			)
 		);
-	}	
+	}
 	protected function _isValid() {
 		if (
 			!$this->getApiQuery()->getOptions(Scribendi_Api_Constants::FIELD_CATEGORY_ID, false) &&
@@ -1975,11 +1979,9 @@ class Scribendi_Api_Client_Adaptor_Transport_Curl extends Scribendi_Api_Client_A
 		} else {
 			curl_setopt_array($ch, $this->getTransportOptions()->toArray());
 			curl_setopt($ch, CURLOPT_HEADER, 0);
-			curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
-			curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 			curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 			curl_setopt($ch, CURLOPT_FAILONERROR, false);
-			curl_setopt($ch, CURLOPT_USERAGENT, 'Scribendi API Client for PHP (v.'.Scribendi_Api_Constants::API_CLIENT_VERSION.')');
+			curl_setopt($ch, CURLOPT_USERAGENT,	'Scribendi API Client for PHP  (v.'.Scribendi_Api_Constants::API_CLIENT_VERSION.')');
 			$response = curl_exec($ch);
 			$errNum = curl_errno($ch);
 			$errMsg = htmlentities(curl_error($ch).' (URI: '.$uri.')', ENT_QUOTES, 'UTF-8');

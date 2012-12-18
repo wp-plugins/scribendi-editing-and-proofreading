@@ -3,14 +3,14 @@
 Plugin Name: Scribendi.com Editing and Proofreading Services
 Plugin URI: http://wordpress.org/extend/plugins/scribendi-editing-and-proofreading/
 Description: Scribendi provides ISO certified, comprehensive, and professional editing services to WordPress users. Our services are available 24/7.
-Version: 1.2.0
+Version: 2.0.0
 Author: Scribendi.com
 Author URI: http://www.scribendi.com/
 */
 /*  Copyright 2011  Scribendi.com (link : http://www.scribendi.com/contact)
 
     This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License, version 2, as 
+    it under the terms of the GNU General Public License, version 2, as
     published by the Free Software Foundation.
 
     This program is distributed in the hope that it will be useful,
@@ -31,11 +31,12 @@ define('SCRIBENDI_CHECK_PERIOD', 5 * 60); // query server period in seconds
 define('SCRIBENDI_PLUGIN_DIR', WP_PLUGIN_DIR . '/' . plugin_basename(dirname(__FILE__)));
 define('SCRIBENDI_PLUGIN_URL', WP_PLUGIN_URL . '/' . plugin_basename(dirname(__FILE__)));
 define('SCRIBENDI_SERVICE', 258); // service to use, DO NOT CHANGE!
+define('SCRIBENDI_PLUGIN_SOURCE', 'wordpress');
 
 /*
  * Set language resource
  */
-load_plugin_textdomain('scribendi', SCRIBENDI_PLUGIN_DIR.'/lib/languages/');
+load_plugin_textdomain('scribendi', false, 'lib/languages/');
 
 /*
  * Register the activation hook
@@ -45,7 +46,7 @@ register_activation_hook(__FILE__, 'scribendi_activate');
 /*
  * Display errors
  */
-if ('error_scrape' == $_GET['action']) {
+if ( isset($_GET['action']) && 'error_scrape' == $_GET['action']) {
 	echo get_option('scribendi_activate_error');
 	delete_option('scribendi_activate_error');
 	die();
@@ -58,7 +59,7 @@ if ('error_scrape' == $_GET['action']) {
  */
 function scribendi_activate() {
 	$error = '';
-	
+
 	/*
 	 * Block old versions of PHP
 	 */
@@ -66,17 +67,17 @@ function scribendi_activate() {
 		$error .= __('Your version of PHP is too old to run the Scribendi plugin.', 'scribendi').'<br />';
 		$error .= __('Please update your PHP installation to at least 5.2.3.', 'scribendi').'<br />';
 		$error .= __('You must deactivate this plugin.', 'scribendi');
-		
+
 		add_option('scribendi_activate_error', $error);
 		trigger_error('', E_USER_ERROR);
 	}
-	
+
 	if ( defined('WP_POST_REVISIONS') && WP_POST_REVISIONS != 'WP_POST_REVISIONS' ) {
 		if ( WP_POST_REVISIONS !== true || WP_POST_REVISIONS !== -1) {
 			$error .= __('You have either disabled or limited the Wordpress Revision System.', 'scribendi').'<br />';
 			$error .= __('Please set WP_POST_REVISIONS to true before using the Scribendi plugin.', 'scribendi').'<br />';
 			$error .= __('You must deactivate this plugin.', 'scribendi');
-			
+
 			add_option('scribendi_activate_error', $error);
 			trigger_error('', E_USER_ERROR);
 		}
@@ -94,23 +95,23 @@ function logMessage($inMessage, $inSource = '[ALWAYS]') {
 	if ( is_array($inMessage) || is_object($inMessage) ) {
 		$inMessage = print_r($inMessage,1);
 	}
-	
+
 	/*
 	 * Remove any carriage returns (ascii 13)
 	 */
 	$inMessage = preg_replace("/\r/", '', $inMessage);
-	
+
 	/*
 	 * Prefix with a timestamp and the $source if set, using the mask set in the writer for the date
 	 */
 	$datestamp = date('Y-m-d H:i:s');
-	
+
 	/*
 	 * Strip new lines and reformat with timestamp
 	 */
 	$inMessage = preg_replace("/\n/", "\n$datestamp".(($inSource) ? " $inSource" : ''), $inMessage);
 	$inMessage = $datestamp.(($inSource) ? " $inSource" : '')." $inMessage\n";
-	
+
 	$logFile = dirname(__FILE__).'/debug.log';
 	if ( !file_exists($logFile) ) {
 		touch($logFile);
@@ -127,6 +128,7 @@ require_once SCRIBENDI_PLUGIN_DIR.'/lib/scribendi_api_lib.php';
 require_once SCRIBENDI_PLUGIN_DIR.'/lib/views.php';
 require_once SCRIBENDI_PLUGIN_DIR.'/lib/api_functions.php';
 require_once SCRIBENDI_PLUGIN_DIR.'/lib/callbacks.php';
+require_once SCRIBENDI_PLUGIN_DIR.'/lib/account_functions.php';
 require_once SCRIBENDI_PLUGIN_DIR.'/lib/order_functions.php';
 spl_autoload_register('Scribendi_Api_Autoloader::autoload');
 
@@ -164,16 +166,15 @@ define('SCRIBENDI_TOOLBOX_ID', 'scribendi_toolbox');
 /*
  * Register our additional stylesheet
  */
-wp_enqueue_style('scribendi_style', SCRIBENDI_PLUGIN_URL.'/css/scribendi.css', null, '1.2', 'screen');
-wp_enqueue_script('jquery-ui-dialog');
-wp_enqueue_style('wp-jquery-ui-dialog');
+add_action('admin_init', 'scribendi_enqueue_styles');
+add_action('admin_init', 'scribendi_enqueue_scripts');
 
 /*
  * Register admin menu and header components
  */
 add_action('admin_menu', 'scribendi_create_menu');
 add_action('admin_menu', 'scribendi_register_sidebar_controls');
-add_action('admin_head', 'scribendi_register_ajax_calls');
+add_action('admin_footer', 'scribendi_register_ajax_calls');
 add_action('admin_footer', 'scribendi_dialog_templates');
 
 /*
@@ -202,3 +203,4 @@ add_action('admin_init', 'scribendi_order_status_update');
 add_action('wp_ajax_scribendi_quote', 'scribendi_quote');
 add_action('wp_ajax_scribendi_order', 'scribendi_order');
 add_action('wp_ajax_scribendi_order_cancel', 'scribendi_order_cancel');
+add_action('wp_ajax_scribendi_key_check', 'scribendi_key_check');

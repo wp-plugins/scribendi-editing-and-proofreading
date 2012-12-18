@@ -51,7 +51,7 @@ function scribendi_prepare_client() {
  * If an error occurs during testing, the Exception is returned,
  * otherwise this function will return boolean true if all is OK.
  *
- * @return true|Exception
+ * @return boolean|Exception
  */
 function scribendi_test_api_settings() {
 	try {
@@ -127,7 +127,7 @@ function scribendi_get_currencies() {
 /**
  * Returns the default customer id, or false if not set
  *
- * @return integer|false
+ * @return integer|boolean
  */
 function scribendi_get_default_customer_id() {
 	return get_option(SCRIBENDI_CUSTOMER_ID, false);
@@ -137,6 +137,7 @@ function scribendi_get_default_customer_id() {
  * Returns the default currency object
  *
  * @return Scribendi_Api_Model_Currency
+ * @throws LogicException
  */
 function scribendi_get_default_currency() {
 	$currencyId = get_option(SCRIBENDI_DEFAULT_CURRENCY, 840);
@@ -156,16 +157,17 @@ function scribendi_get_default_currency() {
 
 /**
  * Returns the scribendi order object from the post ID
- * 
+ *
  * First checks for a scribendi order reference before loading
  * the order details. If (for whatever reason) the order object
  * has become corrupted, it will attempt to be reloaded from
  * the Scribendi API.
- * 
+ *
  * This function always returns an order object - check status
  * and description for errors.
  *
  * @param integer $inPostId
+ * @throws LogicException
  * @return Scribendi_Api_Model_Order
  */
 function scribendi_get_order_from_post($inPostId) {
@@ -235,4 +237,21 @@ function scribendi_get_word_count($inContent) {
 	$inContent = strip_tags($inContent);
 	
 	return preg_match_all("/\S+/", $inContent, $matches);
+}
+
+/**
+ * Generates a request key for registering with scribendi.com
+ *
+ * @return string
+ */
+function scribendi_generate_reg_key() {
+	$l = 64;
+	$c = "npqrstvwxyzbcdfghjkmBCDFGHJKLMNPQRSTVWXYZ56789234";
+	$s = $c{mt_rand(0,40)};
+
+	while (strlen($s) < $l) {
+		$s .= $c{mt_rand(0,48)};
+	} // while
+
+	return $s;
 }

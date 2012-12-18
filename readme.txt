@@ -2,10 +2,10 @@
 Contributors: Scribendi
 Tags: copy-editing, copyediting, copy-editors, publishing, scribendi, grammar, spelling, punctuation, structure, post-publish editing, editors, editor, page, pages, post, posts
 Requires at least: 3.0
-Tested up to: 3.3
+Tested up to: 3.4.2
 Stable tag: trunk
 
-Scribendi provides ISO certified, comprehensive, and professional editing services to WordPress users. Our services are available 24/7.
+Scribendi provides ISO 9001 certified, comprehensive, and professional editing services to WordPress users. Our services are available 24/7.
 
 == Description ==
 
@@ -51,7 +51,7 @@ If you upgrade manually, simply repeat the installation steps and re-enable the 
 
 2. **How do I set up an account?**
 
-   Once your plugin is installed, you need only visit our web site once to set up your account, and then you will be able to interact with us exclusively through our WordPress plugin. See http://www.scribendi.com/wordpress_plugin for complete details. With the click of a button, you can have your blog post edited in as little as a few hours.
+   Once your plugin is installed, go to the Settings area in your WordPress dashboard to sign up for an API key, and then you will be able to interact with us exclusively through our WordPress plugin. See http://www.scribendi.com/wordpress_plugin for complete details. With the click of a button, you can have your blog post edited in as little as a few hours.
 
 3. **What are my payment options?**
 
@@ -65,16 +65,15 @@ If you upgrade manually, simply repeat the installation steps and re-enable the 
 
    Your post is uploaded over a secure connection directly to our servers. You can check what we have received by using the Order link in your revision history.
 
-== Upgrade Notice ==
-
-There are currently no upgrade issues.
-
 == Screenshots ==
 
 1. Get an instant quote.
 2. Order from your posts screen.
 
 == Changelog ==
+= 2.0 =
+* Sign up and get your Scribendi API key from within your WordPress dashboard 
+
 = 1.2 =
 * Fixed an issue with Chrome browser support
 
@@ -85,6 +84,9 @@ There are currently no upgrade issues.
 * First release
 
 == Upgrade Notice ==
+
+= 2.0 =
+Recommended Update. Improved registration process.
 
 = 1.2 =
 Recommended Update. Resolves compatibility issues with Chrome.
