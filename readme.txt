@@ -2,7 +2,7 @@
 Contributors: Scribendi
 Tags: copy-editing, copyediting, copy-editors, publishing, scribendi, grammar, spelling, punctuation, structure, post-publish editing, editors, editor, page, pages, post, posts
 Requires at least: 3.0
-Tested up to: 3.4.2
+Tested up to: 3.6
 Stable tag: trunk
 
 Scribendi provides ISO 9001 certified, comprehensive, and professional editing services to WordPress users. Our services are available 24/7.
@@ -71,6 +71,9 @@ If you upgrade manually, simply repeat the installation steps and re-enable the 
 2. Order from your posts screen.
 
 == Changelog ==
+= 2.1 =
+* Updated JQuery BlockUI to 2.64 to fix JQuery 1.10 warning in WordPress 3.6
+
 = 2.0 =
 * Sign up and get your Scribendi API key from within your WordPress dashboard 
 
@@ -84,6 +87,9 @@ If you upgrade manually, simply repeat the installation steps and re-enable the 
 * First release
 
 == Upgrade Notice ==
+
+= 2.1 =
+Recommended Update. Resolves compatibility issues with WordPress 3.6
 
 = 2.0 =
 Recommended Update. Improved registration process.

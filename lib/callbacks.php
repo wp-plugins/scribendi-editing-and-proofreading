@@ -22,7 +22,7 @@ function scribendi_enqueue_styles() {
  */
 function scribendi_enqueue_scripts() {
 	wp_enqueue_script('jquery-ui-dialog');
-	wp_enqueue_script('jquery-blockUI', SCRIBENDI_PLUGIN_URL . '/js/jquery.blockUI.js', 'jquery', '2.53', true );
+	wp_enqueue_script('jquery-blockUI', SCRIBENDI_PLUGIN_URL . '/js/jquery.blockUI.js', 'jquery', '2.64', true );
 }
 
 /**
