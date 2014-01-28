@@ -167,7 +167,7 @@ function scribendi_post_revisions_meta_box($post) {
 		<th scope="col">'.__('Author').'</th>
 		<th scope="col" class="action-links">'.__('Actions').'</th>
 		</tr></thead><tbody>';
-	
+
 	foreach ( $revisions as $revision ) {
 		if ( !current_user_can( 'read_post', $revision->ID ) ) {
 			continue;
@@ -188,8 +188,20 @@ function scribendi_post_revisions_meta_box($post) {
 		
 		echo '<tr class="'.$class.'"><td>'.$date.'</td><td>'.$name.'</td><td class="action-links">';
 		if ( $post->ID != $revision->ID && $can_edit_post ) {
-			echo '<a href="revision.php?action=diff&right='.$post->ID.'&left='.$revision->ID.'">Compare</a>';
-			echo ' | <a href="revision.php'.wp_nonce_url(add_query_arg(array( 'revision' => $revision->ID, 'diff' => false, 'action' => 'restore')), "restore-post_$post->ID|$revision->ID" ).'">'. __('Publish', 'Scribendi').'</a>';
+
+            if ( get_bloginfo('version') >= 3.6 ) {
+
+                $wp_nonce = wp_create_nonce('restore-post_' . $revision->ID);
+
+			    echo '<a href="revision.php?revision='.$revision->ID.'">' . __('Compare', 'Scribendi') . '</a>';
+                echo ' | <a href="revision.php?revision=' . $revision->ID . '&action=restore&_wpnonce=' . $wp_nonce . '">' . __('Publish', 'Scribendi').'</a>';
+
+            } else {
+
+                echo '<a href="revision.php?action=diff&right='.$post->ID.'&left='.$revision->ID.'">Compare</a>';
+                echo ' | <a href="revision.php'.wp_nonce_url(add_query_arg(array( 'revision' => $revision->ID, 'diff' => false, 'action' => 'restore')), "restore-post_$post->ID|$revision->ID" ).'">'. __('Publish', 'Scribendi').'</a>';
+
+            }
 		}
 		echo '</td></tr>';
 	}
