@@ -2,7 +2,7 @@
 Contributors: Scribendi
 Tags: copy-editing, copyediting, copy-editors, publishing, scribendi, grammar, spelling, punctuation, structure, post-publish editing, editors, editor, page, pages, post, posts
 Requires at least: 3.0
-Tested up to: 4.1
+Tested up to: 4.3
 Stable tag: trunk
 
 Scribendi provides ISO 9001 certified, comprehensive, and professional editing services to WordPress users. Our services are available 24/7.
